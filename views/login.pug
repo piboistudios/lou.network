@@ -1,0 +1,27 @@
+extends layouts/auth
+
+block card
+    //- .is-flex.is-justify-content-center
+        .title.has-text-warning-light Log-In
+   
+    .has-text-danger-light #{error}
+    form#form.form.m-auto(style="width:75%;max-width:512px" action="/auth/login?"+querystring method="post")
+        .container.section
+                .field
+                    .control.has-icons-left
+                        input.input(name="username" type="text" placeholder="username")
+                        .icon.is-left
+                            i.fas.fa-user
+                .field
+                    .control.has-icons-left.is-grouped
+                        .control.password.has-icons-left.mb-3
+                            input.input(name="password" type="password" placeholder="password")
+                            .icon.is-left
+                                i.fas.fa-key
+                        input.checkbox.is-large.mx-5#passcode(name="passcode" type="checkbox" placeholder="username")
+                        label.is-size-7-mobile.is-size-5.has-text-weight-bold.has-text-warning-light(for="passcode") Use a One-Time Passcode
+                .field.is-flex.is-justify-content-space-between
+                    .control
+                        a.has-text-warning.is-size-7-mobile(href="/auth/sign-up?" + querystring) Don't have an account? Sign up
+                    .control
+                        input.button.is-link(type="submit" value="Log In")

@@ -1,0 +1,16 @@
+extends ../layouts/mail
+
+block content
+    .subtitle.mb-5 One-Time Passcode
+    p.has-text-dark Hello
+        if username
+            | , #{username} 
+            if email
+                | (#{email})
+
+    p.has-text-dark
+        strong.has-text-dark Your lou.network one-time passcode: 
+            span(style="margin-right:2px") #{code[0]}
+            span(style="margin-left:2px") #{code[1]}
+block footer
+    include abuse-notice

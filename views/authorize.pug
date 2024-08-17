@@ -1,0 +1,45 @@
+//- 
+    {
+    username,
+    email,
+    querystring: new URLSearchParams(req.query),
+    incorrect: req.query.incorrect
+
+  }
+extends layouts/auth
+
+block card
+    style.
+        #form * {
+            min-width: 50%;
+        }
+    form#form.is-flex.is-flex-direction-column.is-align-items-center.mb-5.mt-0(
+        action="?" + querystring
+        method="post"
+    )
+        .has-text-warning-light
+            .title.has-text-warning-light(Style="border-bottom: 1px solid;margin-bottom:0") 
+                h1 #{client.name || client.id}
+            .is-flex.is-justify-content-space-between.mb-5
+                if client.url
+                    a.has-text-warning(href=client.url) Website
+                if client.company
+                    span.has-text-warning by #{client.company}
+            
+        .menu.mb-5
+            p.menu-label.has-text-warning-light This app is requesting permission to:
+            ul
+                each s in scope
+                    li
+                        .is-flex.is-flex-direction-column
+                            label: strong.has-text-warning-light #{s.name}: 
+                            span.has-text-warning.mx-3 #{s.description}
+
+        .field.is-grouped-right.is-flex.is-justify-space-between.mt-5
+            .control
+                a.button.is-link-light(href="/") Cancel
+            .control
+                input#submit.button.is-link(type="submit" value="Allow")
+
+    script
+        include assets/otp-listeners.js

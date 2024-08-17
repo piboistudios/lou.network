@@ -1,0 +1,85 @@
+{
+	"windowTitle": "Kiwi IRC - The web IRC client",
+	"startupScreen": "sasl-oauth-external",
+	"restricted": false,
+	"theme": "default",
+	"disconnectOnSaslFail": false,
+	"themes": [
+		{
+			"name": "Default",
+			"url": "../stylesheets/themes/default"
+		},
+		{
+			"name": "Kiwi",
+			"url": "../stylesheets/themes/kiwi"
+		},
+		{
+			"name": "Dark",
+			"url": "../stylesheets/themes/dark"
+		},
+		{
+			"name": "Coffee",
+			"url": "../stylesheets/themes/coffee"
+		},
+		{
+			"name": "GrayFox",
+			"url": "../stylesheets/themes/grayfox"
+		},
+		{
+			"name": "Nightswatch",
+			"url": "../stylesheets/themes/nightswatch"
+		},
+		{
+			"name": "Osprey",
+			"url": "../stylesheets/themes/osprey"
+		},
+		{
+			"name": "Radioactive",
+			"url": "../stylesheets/themes/radioactive"
+		},
+		{
+			"name": "Sky",
+			"url": "../stylesheets/themes/sky"
+		},
+		{
+			"name": "Elite",
+			"url": "../stylesheets/themes/elite"
+		}
+	],
+	"buffers": {
+		"show_message_info_desktop": true
+	},
+	"startupOptions": {
+		"server": "localhost",
+		"port": 3800,
+		"tls": false,
+		"channel": "",
+		"nick": ""
+	},
+	"embedly": {
+		"key": ""
+	},
+	"oauth2": {
+		"baseURL": "http://localhost:3800",
+		"clientId": "localhost",
+		"scope": "profile openid offline_access"
+	},
+	"plugins": [
+		{
+			"name": "sasl-oauth-external-startup",
+			"url": "/javascripts/sasl-oauth-external-startup.js"
+		},
+		{
+			"name": "message-replies",
+			"url": "/javascripts/message-replies.js"
+		},
+		{
+			"name": "multiline",
+			"url": "/javascripts/multiline.js"
+		},
+		{
+			"name": "account",
+			"url": "/javascripts/account.js"
+		}
+	]
+}

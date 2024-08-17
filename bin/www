@@ -1,0 +1,216 @@
+#!/usr/bin/env node
+const bizi = require('bizi-irc/app');
+const state = require('../state');
+const path = require('path');
+require('dotenv').config();
+const { mkLogger } = require('../logger');
+const fs = require('fs');
+const logger = mkLogger('www');
+const { Sequelize } = require('sequelize');
+const sequelize = new Sequelize({
+  dialect: 'sqlite',
+  alter: true,
+  storage: process.env.DB_PATH || 'db.sqlite',
+  logging: logger.sub('db').trace.bind(logger), // Alternative way to use custom logger, displays all messages
+});
+const CERT_PATH = process.env.TLS_CERT_PATH || '/tls/cert.pem';
+const KEY_PATH = process.env.TLS_KEY_PATH || '/tls/key.pem';
+const keysExist = [KEY_PATH, CERT_PATH].map(p => fs.existsSync(p)).every(v => Boolean(v))
+/**
+ * Create HTTP server.
+ */
+
+async function main() {
+  if (!process.env.HOSTNAME) {
+    process.env.HOSTNAME = require('os').hostname()
+  }
+  logger.trace("Starting");
+  const ret = await sequelize.query('PRAGMA journal_mode=WAL;')
+  logger.trace("WAL?", ret);
+  try {
+    await sequelize.authenticate();
+    console.log('Connection has been established successfully.');
+  } catch (error) {
+    console.error('Unable to connect to the database:', error);
+  }
+  state.db = sequelize;
+  /**
+   * Module dependencies.
+   */
+
+  await Promise.all(fs.readdirSync(path.join(__dirname, '../models')).map(async p => {
+    try {
+
+      const model = require(path.join(__dirname, '../models/', p));
+      if (model) {
+        await model.sync({ alter: true });
+      }
+    } catch (e) {
+      logger.error("Error loading model:", p, e);
+    }
+  }));
+  const oauthToken = require('../models/oauth-token')
+
+  var app = require('../app');
+  var debug = require('debug')('lou.network:server');
+  const http = require('http');
+  const https = require('https');
+
+  /**
+   * Get port from environment and store in Express.
+   */
+
+  var port = normalizePort(process.env.PORT || '3000');
+  app.set('port', port);
+
+  /**
+   * Create HTTP server.
+   */
+
+  var server = keysExist ? https.createServer({
+    key: fs.readFileSync(KEY_PATH),
+    cert: fs.readFileSync(CERT_PATH)
+  }, app) : http.createServer(app);
+  try {
+
+    await sequelize.sync({ alter: true })
+  } catch (e) {
+    logger.trace("Failed to sync:", e);
+  }
+  const account = require('../models/account');
+  const irc = await bizi({
+    hostname: process.env.HOSTNAME || 'lou.network',
+    dbRefreshInterval: 5000,
+    authHandlers: {
+      oauth2: async (ctx, u) => {
+        const tok = await oauthToken.findOne({
+          where: {
+            data: ctx.auth.split(' ').pop()
+          }
+        });
+        logger.trace("Token:", tok);
+        if (!tok) return null;
+        const user = await account.findByPk(tok.user);
+        return new Promise((resolve, reject) => app.session(u.req, {}, () => {
+
+          logger.trace("u.req:", u.req);
+          logger.trace("u.req.session:", u.req.session);
+          if (u?.req && !u.req.session.user && user) {
+            u.req.session.user = user;
+            u.req.session.save();
+          }
+          logger.trace("User:", user);
+          resolve({
+            uid: [process.env.HOSTNAME, user.id].join('-'),
+            ...(user.toJSON() || {})
+          });
+        })
+        )
+      },
+      external: async u => {
+        if (!app.session) throw new Error("ruh roh no session dawg");
+
+        return new Promise((resolve, reject) => {
+          app.session(u.req, {}, () => {
+            logger.trace("Session?", u.req.session);
+            const user = u.req.session.user;
+            if (!user) return reject("Not logged in.");
+            resolve({
+              uid: [process.env.HOSTNAME, user.id].join('-'),
+              ...(user || {}),
+
+            })
+          })
+        })
+      }
+    },
+
+    sequelize,
+    server,
+
+  });
+  logger.trace("irc", irc);
+  logger.trace("irc.on", irc.on);
+  irc.on('user', u => {
+    logger.trace("ayeee, got a user in the lou", u);
+  });
+  irc.on('message', function (message) {
+    logger.trace("message?", message.toString());
+  })
+  /**
+   * Listen on provided port, on all network interfaces.
+   */
+
+  server.listen(port);
+  server.on('error', onError);
+  server.on('listening', onListening);
+
+  /**
+   * Normalize a port into a number, string, or false.
+   */
+
+  function normalizePort(val) {
+    var port = parseInt(val, 10);
+
+    if (isNaN(port)) {
+      // named pipe
+      return val;
+    }
+
+    if (port >= 0) {
+      // port number
+      return port;
+    }
+
+    return false;
+  }
+
+  /**
+   * Event listener for HTTP server "error" event.
+   */
+
+  function onError(error) {
+    if (error.syscall !== 'listen') {
+      throw error;
+    }
+
+    var bind = typeof port === 'string'
+      ? 'Pipe ' + port
+      : 'Port ' + port;
+
+    // handle specific listen errors with friendly messages
+    switch (error.code) {
+      case 'EACCES':
+        console.error(bind + ' requires elevated privileges');
+        process.exit(1);
+        break;
+      case 'EADDRINUSE':
+        console.error(bind + ' is already in use');
+        process.exit(1);
+        break;
+      default:
+        throw error;
+    }
+  }
+
+  /**
+   * Event listener for HTTP server "listening" event.
+   */
+
+  function onListening() {
+    var addr = server.address();
+    var bind = typeof addr === 'string'
+      ? 'pipe ' + addr
+      : 'port ' + addr.port;
+    debug('Listening on ' + bind);
+    // process.env.NODE_ENV === 'development' && logger.trace("Env:", process.env)
+
+  }
+}
+main()
+  .then(() => {
+    logger.trace("Started");
+  })
+  .catch(e => {
+    logger.fatal("App failure:", e);
+  })

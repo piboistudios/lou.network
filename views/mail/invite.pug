@@ -1,0 +1,14 @@
+extends ../layouts/mail
+//- 
+  email,
+      details,
+      link
+block content
+    .block
+        p You've been invited to lou.network! 
+        a(href=link) Click here to get connected
+    .block.content #{details}
+
+block footer
+    p If you're receiving this message consider yourself officially initiated into the cool kids club.
+    

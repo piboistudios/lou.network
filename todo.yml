@@ -1,0 +1,86 @@
+- models [X]:
+  - user [X]
+  - client [X]
+  - oauthtoken [X]
+  - oauthcode [X]
+  -  oauthscope [X]
+- auth [ ]:
+  - routes [X]
+  - ui [ ]:
+    - sign-up [X]
+    - mail/passcode [X]
+    - registration_passcode [X] 
+    - mail/invite [X]
+    - invite [X] 
+    - login [X] 
+    - login_passcode [X] 
+    - reset-password [X] 
+    - reset-passwod_instructions [X] 
+    - reset-passwod_new-pass [X] 
+    - reset-passwod_completed [X] 
+    - reset-password_link [X]
+    - testing [X]
+  - oauth2 metadata and oidc url [X]:
+    - authorization url [X]
+    - token url [X]
+    - introspection url [X] - waste of time
+    - userinfo url [X]
+  - oauth authorization_code flow  [X]:
+    - testing [X]
+  - bring irc server back up to IRCv3 spec [ ]:
+    - sasl oauthbearer [/]:
+      - protocol [/] (move to `saslmechanisms`)
+      - ~introspect token, verify user~ [-]
+      - get _userinfo_, verify user [X]:
+        - split AUTHENTICATE OAUTHBEARER payload properly... [X]
+    - sasl external [X]:
+      - testing in console [X]
+  - kiwiirc [ ]:
+    - tbd [X]:
+      - make chathistory work [X]
+      - multiline [X]
+      - default theme [X]
+      - fix names/channel list [X]
+      - message info [X]
+      - message replies [X]:
+        - reply button (set context, render some UI there in buffer state) [X]
+        - add tag to message when sent, unset buffer context [X]
+        - on messges with draft/reply tag, reference message with clickable linkback [X]:
+          - actually do UI [X]
+      - invite/banlist audit fix [X]
+      
+      - scroll-to-bottom ui when new/unread messages in buffer [ ]
+      - message reacts [ ]
+      - channel modes [ ]
+      - user modes [ ]
+      - threading [ ]
+      - channel context [ ]
+      - account registration spec [ ]
+      - sasl v3.2 [ ]
+      - account-extban [ ]
+      - account-notify [ ]
+      - account-tag [X]
+      - extended-join [ ]
+      - away-notify [ ]
+      - netsplit/netjoin [ ]
+      - message-redaction [ ]
+      - read-marker [ ]
+      - pre-away [ ]
+      - channel rename [ ]
+      - invite-notify [ ] 
+      - labeled-response [ ]
+      - no implicit names [ ]
+      - monitor [ ]
+      - SNI [ ]
+      - STS [ ]
+
+    - pwa (please god work) [ ]:
+      - push notifs
+  - irc:
+    - sasl [ ]:
+      - use `saslmechanisms` [ ]
+      - sasl scram-sha-256 [ ]
+      - sasl oauthbearer [ ]
+      - sasl xoauth2 [ ]
+      - sasl x-oauth2 [ ]
+  

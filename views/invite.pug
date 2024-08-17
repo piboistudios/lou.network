@@ -1,0 +1,11 @@
+extends layouts/auth
+
+block card
+    .is-flex.is-justify-content-center.mb-5
+        .title.has-text-primary-light Enter your Username
+    form.mt-5.form#form(action="/auth/invite/accept?" + querystring method="post")
+        .field
+            .control
+                input.input#username(name="username" type="text" placeholder="khfaooty")
+                
+    

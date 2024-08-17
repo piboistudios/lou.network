@@ -1,0 +1,9 @@
+config
+queue
+node_modules
+**/*.env
+secrets/**
+kiwiirc/**
+public
+views
+fixtures

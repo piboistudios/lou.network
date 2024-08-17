@@ -1,0 +1,31 @@
+//- 
+    {
+    username,
+    email,
+    querystring: new URLSearchParams(req.query),
+    incorrect: req.query.incorrect
+
+  }
+extends layouts/auth
+
+block card
+    .has-text-danger-light #{error}
+    form#form.is-flex.is-flex-direction-column.is-align-items-center(
+        action=postTo + "?" + querystring
+        method="post"
+    )
+        .field.is-grouped-center
+            label.label.subtitle.has-text-center(for="otp") Enter your One-Time Passcode:
+            .control#inputs.inputs.is-flex.is-justify-content-center
+                input.content.otp#otp(name="code" type='text' inputmode='numeric' maxlength='2')
+                input.content.otp(name="code" type='text' inputmode='numeric' maxlength='2')
+                input.content.otp(name="code" type='text' inputmode='numeric' maxlength='2')
+                input.content.otp(name="code" type='text' inputmode='numeric' maxlength='2')
+                input.content.otp(name="code" type='text' inputmode='numeric' maxlength='2')
+                input.content.otp(name="code" type='text' inputmode='numeric' maxlength='2')
+                br
+        .field
+            .control
+                input#submit.button.is-link(type="submit")
+    script
+        include assets/otp-listeners.js
