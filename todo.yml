@@ -36,7 +36,7 @@
     - sasl external [X]:
       - testing in console [X]
   - kiwiirc [ ]:
-    - tbd [X]:
+    - ircv3 [ ]:
       - make chathistory work [X]
       - multiline [X]
       - default theme [X]
@@ -48,14 +48,28 @@
         - on messges with draft/reply tag, reference message with clickable linkback [X]:
           - actually do UI [X]
       - invite/banlist audit fix [X]
-      
-      - scroll-to-bottom ui when new/unread messages in buffer [ ]
-      - message reacts [ ]
-      - channel modes [ ]
-      - user modes [ ]
-      - threading [ ]
+      - message reacts [X]:
+        - ui click handling properly [/]
+        - message redaction (remove reactions) [ ]
+      - sasl anonymous [X]
+      - nicknamespaced state [X]
+      - standard replies [/]
+      - fix chathistory scrollback for non-ui messages [ ]
+      - more emoji picker patches [/]
+      - message redaction/react removal [X]
+      - echo-message [X]
+      - labeled responses [X]
+      - uri proto handlers [ ]
+      - vid chat [ ]:
+        - ctcp+tags to broker webrtc cnx [ ]
+        - tensorflow+bodypix for backgrounds [ ]
+        - vosklet for transcription [ ]
+        - transcribe to SOFTCHAN [ ]
       - channel context [ ]
+      - mode validation [/]
       - account registration spec [ ]
+      - performance issues with chathistory [X] 
+      - INVITES GO OUT [ ]
       - sasl v3.2 [ ]
       - account-extban [ ]
       - account-notify [ ]
@@ -65,6 +79,7 @@
       - netsplit/netjoin [ ]
       - message-redaction [ ]
       - read-marker [ ]
+      - scroll-to-bottom ui when new/unread messages in buffer [ ]
       - pre-away [ ]
       - channel rename [ ]
       - invite-notify [ ] 
@@ -73,9 +88,16 @@
       - monitor [ ]
       - SNI [ ]
       - STS [ ]
-
+      - threading [ ]
+      - chathistory targets [ ]
+    - irc in general [ ]:
+      - channel modes [ ]
+      - user modes [ ]
+      - refactor [ ]:
+        - auth middleware
     - pwa (please god work) [ ]:
-      - push notifs
+      - history api/push state for mobile [ ]:
+        - entrypoint routes (custom uri protocol handlers)      
   - irc:
     - sasl [ ]:
       - use `saslmechanisms` [ ]

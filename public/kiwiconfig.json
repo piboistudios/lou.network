@@ -4,6 +4,10 @@
 	"restricted": false,
 	"theme": "default",
 	"disconnectOnSaslFail": false,
+	"eventPlaybackEnabled": true,
+	"echoMessages": true,
+	"labeledResponses": true,
+	"messageRedaction": true,
 	"themes": [
 		{
 			"name": "Default",
@@ -46,6 +50,7 @@
 			"url": "../stylesheets/themes/elite"
 		}
 	],
+	"forceShowEmojiPicker": true,
 	"buffers": {
 		"show_message_info_desktop": true
 	},
@@ -64,18 +69,74 @@
 		"clientId": "localhost",
 		"scope": "profile openid offline_access"
 	},
+	"plugin-emojis": {
+		"sendNativeEmojis": true,
+		"imageTitle": "name", // 'name', 'colons', 'native', ''
+		"emojiSet": "google", // 'apple', 'google', 'twitter', 'facebook', 'native'
+		"pickerProps": {
+			"emoji": "point_up",
+			"title": "",
+			"perLine": 8,
+			"i18n": {
+				"search": "Searchy",
+				"notfound": "No Emoji Found",
+				"categories": {
+					"search": "Search Results",
+					"recent": "Frequently Used",
+					"smileys": "Smileys & Emoticon",
+					"people": "People & Body",
+					"nature": "Animals & Nature",
+					"foods": "Food & Drink",
+					"activity": "Activity",
+					"places": "Travel & Places",
+					"objects": "Objects",
+					"symbols": "Symbols",
+					"flags": "Flags",
+					"custom": "Custom",
+				}
+			}
+		},
+		"frequentlyUsedLength": 16,
+		// Do NOT include the following 3 options unless you intend to set them
+		// doing so would change the default behavour of the plugin
+		// "frequentlyUsedList": [],
+		// "categoryInclude": [],
+		// "categoryExclude": [],
+		// "customEmojis": [
+		//     {
+		//         "name": "Kiwi IRC",
+		//         "short_names": ["kiwiirc"],
+		//         "text": "",
+		//         "emoticons": [],
+		//         "keywords": [],
+		//         "imageUrl": "static/favicon.png",
+		//     },
+		// ],
+	},
 	"plugins": [
 		{
+			"name": "emoji",
+			"url": "/javascripts/dist/emoji-webpacked.js"
+		},
+		{
 			"name": "sasl-oauth-external-startup",
-			"url": "/javascripts/sasl-oauth-external-startup.js"
+			"url": "/javascripts/dist/sasl-startup-webpacked.js"
 		},
 		{
 			"name": "message-replies",
-			"url": "/javascripts/message-replies.js"
+			"url": "/javascripts/dist/message-replies-webpacked.js"
 		},
 		{
 			"name": "multiline",
-			"url": "/javascripts/multiline.js"
+			"url": "/javascripts/dist/multiline-webpacked.js"
+		},
+		{
+			"name": "message-redaction",
+			"url": "/javascripts/dist/message-redaction-webpacked.js"
+		},
+		{
+			"name": "echo-labeled-response",
+			"url": "/javascripts/dist/echo-labeled-response-webpacked.js"
 		},
 		{
 			"name": "account",

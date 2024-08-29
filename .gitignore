@@ -41,4 +41,10 @@ arch
 *.sqlite*
 kiwiirc
 db/**
+public/kiwi
+public/javascripts
+plugins
+secrets
+*.html
+*.cssraw
 **/*.tgz

@@ -14,6 +14,7 @@ const authRouter = require('./routes/auth');
 const { mkLogger } = require('./logger');
 const applogger = mkLogger('app');
 const session = require('express-session');
+const { randomUUID } = require('crypto');
 const app = express();
 const STYLE_START = '<!-- style-start-->';
 const STYLE_END = '<!-- style-end-->';
@@ -54,7 +55,14 @@ function doUncss(view, html, opts, callback) {
 //   }
 //   next();
 // })
+app.use(cookieParser());
+
 app.session = session({
+  // genid: req => {
+  //   applogger.trace("cookies:", req.cookies, req.cookie);
+  //   if (!app.session.store.has(req.cookies['connect.sid'])) return randomUUID();
+  //   return req.cookies['connect.sid'] || randomUUID();
+  // },
   // store, 
   secret: process.env.OAUTH_JWT_SECRET,
   cookie: {
@@ -70,6 +78,10 @@ app.use((req, res, next) => {
   res.locals.querystring = req.query ? new URLSearchParams(req.query) : ''
   next();
 })
+app.use((req, res, next) => {
+  applogger.trace("Request:", { ip: req.ip, headers: req.rawHeaders, method: req.method, path: req.path, query: req.query, params: req.params, body: req.body })
+  next();
+})
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -77,7 +89,6 @@ app.set('view engine', 'pug');
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded());
-app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/users', usersRouter);
 app.use("/auth", authRouter)

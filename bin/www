@@ -90,14 +90,30 @@ async function main() {
         });
         logger.trace("Token:", tok);
         if (!tok) return null;
+        const data = tok.toJSON();
+        if (tok.expiresAt <= new Date()) {
+          return tok.destroy()
+            .then(() => {
+              logger.warn("Expired token:", data);
+              return null;
+            })
+        }
         const user = await account.findByPk(tok.user);
-        return new Promise((resolve, reject) => app.session(u.req, {}, () => {
+        return new Promise((resolve, reject) => app.session(u.req, {}, async () => {
 
           logger.trace("u.req:", u.req);
           logger.trace("u.req.session:", u.req.session);
           if (u?.req && !u.req.session.user && user) {
             u.req.session.user = user;
-            u.req.session.save();
+            await new Promise((resolve, reject) => u.req.session.save(e => {
+              if (e) {
+                logger.trace('failed to save session:', e);
+                return reject(e);
+              }
+              logger.trace('session saved successfully');
+              resolve();
+            }))
+            logger.trace('session saved', u.req, u.req.session)
           }
           logger.trace("User:", user);
           resolve({
@@ -129,6 +145,15 @@ async function main() {
     server,
 
   });
+  const auth = require('bizi-irc/middleware/auth');
+  [
+    // ['privmsg'],
+    // ['notice'],
+    ['tagmsg', { sendFail: true }],
+    ['away'],
+    ['invite'],
+    ['nick', { silent: true }],
+  ].forEach(pair => irc.use(pair[0], auth(pair[1] || {})));
   logger.trace("irc", irc);
   logger.trace("irc.on", irc.on);
   irc.on('user', u => {
@@ -203,7 +228,7 @@ async function main() {
       ? 'pipe ' + addr
       : 'port ' + addr.port;
     debug('Listening on ' + bind);
-    // process.env.NODE_ENV === 'development' && logger.trace("Env:", process.env)
+    process.env.NODE_ENV === 'development' && logger.trace("Env:", process.env)
 
   }
 }

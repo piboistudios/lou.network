@@ -1,6 +1,6 @@
 kiwi.plugin('account', function(kiwi, log) {
 
-    const logoutPage = kiwi.Vue.extend({
+    const logoutPage = ({
         template: `<div
             class="kiwi-appsettings-block"
         >

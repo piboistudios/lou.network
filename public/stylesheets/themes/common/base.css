@@ -22,7 +22,12 @@
 .kiwi-welcome-simple .help a {
     color: var(--brand-default-fg);
 }
-
+.kiwi-messagelist-addons {
+    line-height: 0;
+}
+.kiwi-messagelist-message.unloaded {
+    min-height: 64px;
+}
 .kiwi-welcome-simple .help a:hover {
     color: var(--brand-primary-hover);
 }

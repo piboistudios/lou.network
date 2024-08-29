@@ -322,6 +322,9 @@ router.get('/login', async (req, res, next) => {
   }
   return res.render("login")
 });
+const INVALID_CREDS = {
+  error: "Username or password invalid."
+};
 router.post('/login', async (req, res, next) => {
   /**
    * @todo [X] if username/pass:
@@ -339,7 +342,11 @@ router.post('/login', async (req, res, next) => {
   }
   const user = await Account.findOne({
     where: { username }
-  }); if (passcode === 'on') {
+  });
+  if (!user) {
+    return res.status(401).render("login", INVALID_CREDS);
+  }
+  if (passcode === 'on') {
     if (!req.session.login) {
       return res.redirect('/auth/login?' + new URLSearchParams(req.query))
     }
@@ -359,9 +366,7 @@ router.post('/login', async (req, res, next) => {
 
     const verified = await pbkdf2.verify(user.password, password);
     if (!verified) {
-      return res.status(401).render("login", {
-        error: "Username or password invalid."
-      })
+      return res.status(401).render("login", INVALID_CREDS)
     }
     req.session.user = user;
     return res.redirect(req.query.r);
