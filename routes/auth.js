@@ -248,7 +248,8 @@ router.post('/invite', async (req, res, next) => {
     }
   });
   await newUser.save();
-  const link = `${process.env.BASE_URL}/auth/invite/${newUser.id}${landingPage ? '?r=' + encodeURIComponent(landingPage) : '?r=' + encodeURIComponent('/chat/#thelou')}`;
+  const tail = [req.body.query ? '?' + new URLSearchParams(req.body.query) : '', req.body.fragment ? req.body.fragment.charAt(0) === '#' ? req.body.fragment : '#' + req.body.fragment : ''].filter(Boolean).join('') || '#thelou';
+  const link = `${process.env.BASE_URL}/auth/invite/${newUser.id}${landingPage ? '?r=' + encodeURIComponent(landingPage) : '?r=' + encodeURIComponent('/kiwi/'+tail)}`;
   const result = await sendemail({
     to: email,
     subject: "You've been invited 🖅 " + subject,

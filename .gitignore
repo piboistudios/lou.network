@@ -11,7 +11,7 @@ server/server.log
 .DS_Store
 node_modules
 /dist
-
+**/*.eml
 
 # local env files
 **/*.env

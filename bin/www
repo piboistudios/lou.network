@@ -43,7 +43,7 @@ async function main() {
 
       const model = require(path.join(__dirname, '../models/', p));
       if (model) {
-        await model.sync({ alter: true });
+        process.env.SYNC && await model.sync({ alter: true });
       }
     } catch (e) {
       logger.error("Error loading model:", p, e);

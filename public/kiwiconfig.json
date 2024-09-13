@@ -50,25 +50,12 @@
 			"url": "../stylesheets/themes/elite"
 		}
 	],
+	"allowRegisterProtocolHandler": true,
 	"forceShowEmojiPicker": true,
 	"buffers": {
 		"show_message_info_desktop": true
 	},
-	"startupOptions": {
-		"server": "localhost",
-		"port": 3800,
-		"tls": false,
-		"channel": "",
-		"nick": ""
-	},
-	"embedly": {
-		"key": ""
-	},
-	"oauth2": {
-		"baseURL": "http://localhost:3800",
-		"clientId": "localhost",
-		"scope": "profile openid offline_access"
-	},
+	
 	"plugin-emojis": {
 		"sendNativeEmojis": true,
 		"imageTitle": "name", // 'name', 'colons', 'native', ''
@@ -139,8 +126,27 @@
 			"url": "/javascripts/dist/echo-labeled-response-webpacked.js"
 		},
 		{
+			"name": "conference-lite",
+			"url": "/javascripts/dist/conference-lite-webpacked.js"
+		},
+		{
 			"name": "account",
 			"url": "/javascripts/account.js"
 		}
-	]
+	],
+	"startupOptions": {
+		"server": "lou-network.ngrok.io",
+		"port": 443,
+		"tls": true,
+		"channel": "",
+		"nick": ""
+	},
+	"embedly": {
+		"key": ""
+	},
+	"oauth2": {
+		"baseURL": "https://lou-network.ngrok.io",
+		"clientId": "localhost",
+		"scope": "profile openid offline_access"
+	},
 }

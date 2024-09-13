@@ -16,6 +16,8 @@ const applogger = mkLogger('app');
 const session = require('express-session');
 const { randomUUID } = require('crypto');
 const app = express();
+const cors = require('cors');
+process.env.NODE_ENV === 'development' && app.use(cors('*'))
 const STYLE_START = '<!-- style-start-->';
 const STYLE_END = '<!-- style-end-->';
 const cache = {};
@@ -56,7 +58,11 @@ function doUncss(view, html, opts, callback) {
 //   next();
 // })
 app.use(cookieParser());
-
+// app.use((req,res,next) => {
+//   res.header('cross-origin-opener-policy', 'same-origin');
+//   res.header('cross-origin-embedder-policy', 'require-corp');
+//   next();
+// })
 app.session = session({
   // genid: req => {
   //   applogger.trace("cookies:", req.cookies, req.cookie);

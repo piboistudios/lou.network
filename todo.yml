@@ -58,16 +58,102 @@
       - more emoji picker patches [/]
       - message redaction/react removal [X]
       - echo-message [X]
-      - labeled responses [X]
+      - labeled responses [/]:
+        - message prepend addon (show accumulated labeled responses) [ ]
       - uri proto handlers [ ]
-      - vid chat [ ]:
-        - ctcp+tags to broker webrtc cnx [ ]
-        - tensorflow+bodypix for backgrounds [ ]
-        - vosklet for transcription [ ]
-        - transcribe to SOFTCHAN [ ]
+      - vid chat [/]:
+        - ~ctcp+tags~ tagmsg to broker webrtc cnx [X]
+        - toggle audio [X]
+        - toggle video [X]
+        - pin/unpin [X]
+        - no cam/avatar/styling [X]
+        - audio visualization [X]
+        - control bar styling [X]
+        - stream from video el [X]
+        - screen-share [X]
+        - duplicating vids issue/general video state fixes [X]
+        - flip screen issues [X]
+        - perfect negotiation/leaving/rejoining call/channel state/modes [X]
+        - tensorflow+bodypix for backgrounds [X]
+        - ~vosklet for transcription [ ]~
+        - SpeechRecognition for transcription [/]
+        - ~transcribe to SOFTCHAN [ ]~
+        - screensharing deduplication/restriction [X]
+        - avatar audio visualization [X]
+        - remote stream restriction (only 2) [X]
+        - settings styling... [/]
+        - mobile styling (packed tiles/videos, like Discord) [/]:
+          - just better styling [X]
+          - css grid [X]
+        - pinning styling [/]:
+          - resizing fixed [X]
+          - persistent unpin btn (on mobile at least) [ ]
+        - ~medium-zoom~ panzoom [/]:
+          - implement [X]
+          - touch patch [X]
+        - volume indicator [ ]:
+          - canvas not fkin svg [ ]
+          - calibrate [ ]
+        - audio visualization [ ]:
+          - bar width variation based on amplitude/value [ ]
+          - calibrate [ ]
+        - performance [X]:
+          - render based on visibility [X]
+          - declutter/refactor [ ]
+        - fix emoji picker clipping... [X]
+        - video controls patch [/]:
+          - click/hover patch [X]
+          - dynamically show/hide button details [ ]
+        - user tlc [/]:
+          - double clicking vid should [ ]:
+            - pan/zoom to [ ]
+            - open user box [ ]
+          - clicking user/nick link in buffer/channel list should [ ]:
+            - pan/zoom to [ ]
+          - show nick on hover [/]:
+            - show nick [X]
+            - on hover ? [ ]
+        - hooplah [X]:
+          - buffer messages [/]:
+            - notice (show join button on +W chans) [/]:
+              - server [X]:
+                - send on join [/]:
+                  - sends msg... [X]
+                  - needs to use channel-context param [ ]
+                - send on +W [X]
+            - conditionally show call btn based on chan mode [X]
+            - +/- x - `user has joined/left the call` [X]
+            - +/- W - `user has started a/ended`the conference call` [X]
+        - background settings [/]:
+          - blur toggling ;D [X]
+        - drag-resizable mediaviewer [X]
+        - responsiveness [X]
+        - random screenshare bug [ ]
+        - match vid/tile order to buffer order [ ]
+        - rearranging vids somehow [ ]
+      - chathistory patch [ ]:
+        - 
+      - custom uri proto handler/url handler [ ]:
+        - autoopen [ ]:
+          - buffer
+          - nick/pm
+          - messageId
+      - account registration spec [ ]:
+        - server impl [ ]:
+          - account register command (email, username optional, password optional) [ ]: 
+            - send passcode to user
+          - verify [ ]:
+            - validate passcode against one emailed [ ]
+            - create user/account [ ]
+            - set sasl state/log user in [ ]
+        - kiwiirc plugin/ui [ ]
+      - labeled responses [ ]:
+        - proxy wrap user/server [ ]
+        - kiwi.state.addMessage add to labeled buffer if exists over server buffer [ ]
+      - standard replies [ ]:
+        - kiwi UI [ ]
       - channel context [ ]
       - mode validation [/]
-      - account registration spec [ ]
       - performance issues with chathistory [X] 
       - INVITES GO OUT [ ]
       - sasl v3.2 [ ]
@@ -90,6 +176,7 @@
       - STS [ ]
       - threading [ ]
       - chathistory targets [ ]
+      - make mediaviewer draggable [ ]
     - irc in general [ ]:
       - channel modes [ ]
       - user modes [ ]
