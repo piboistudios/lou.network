@@ -131,8 +131,7 @@
         - random screenshare bug [ ]
         - match vid/tile order to buffer order [ ]
         - rearranging vids somehow [ ]
-      - chathistory patch [ ]:
-        - 
+      - chathistory patch [X]
       - custom uri proto handler/url handler [ ]:
         - autoopen [ ]:
           - buffer
