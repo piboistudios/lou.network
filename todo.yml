@@ -131,12 +131,32 @@
         - random screenshare bug [ ]
         - match vid/tile order to buffer order [ ]
         - rearranging vids somehow [ ]
-      - chathistory patch [X]
-      - custom uri proto handler/url handler [ ]:
-        - autoopen [ ]:
-          - buffer
-          - nick/pm
-          - messageId
+      - chathistory patch [X]:
+        - dedupe messages (also just dont save dupes in first place) [X]
+        - fix interleaving batches [X] (https://github.com/kiwiirc/irc-framework/pull/385)
+      - scroll-to-bottom UI [X]
+      - custom uri proto handler/url handler/push-state... [ ]:
+        - server spa routing [X]:
+          - route /kiwi/* routes to kiwiIRC [X]
+          - OAuth client redirect URI globbing [X]
+        - pushstate... [X]:
+          - figure out back btn shat [X]
+          - active.component [X]:
+            - push state when active component called [X]
+            - go back 1 when active component called with null ? [X]
+          - buffer [X]:
+            - replace state [X]
+          - onpopstate [X]:
+            - if no previous state/page, go to server buffer [X]:
+              - if in server buffer, leave page [X]
+        - autoopen [/]:
+          - buffer [X]:
+            - /<CHANPREFIX>chan [X]
+          - nick/pm [X]:
+            - /@nick but also question mark param [X]
+          - messageId [/]:
+            - /buffer or ?nick= + &msgid=<msgid> [X]
+            - need to figure out chathistory for specific msgid... [ ]
       - account registration spec [ ]:
         - server impl [ ]:
           - account register command (email, username optional, password optional) [ ]: 
@@ -146,36 +166,53 @@
             - create user/account [ ]
             - set sasl state/log user in [ ]
         - kiwiirc plugin/ui [ ]
-      - labeled responses [ ]:
-        - proxy wrap user/server [ ]
-        - kiwi.state.addMessage add to labeled buffer if exists over server buffer [ ]
-      - standard replies [ ]:
+      - labeled responses [X]:
+        - proxy wrap user/server [X]
+        - kiwi.state.addMessage add to labeled buffer if exists over server buffer [X]
+      - standard replies [/]:
+        - irc-framework PR [X] (https://github.com/kiwiirc/irc-framework/pull/386)
         - kiwi UI [ ]
-      - channel context [ ]
-      - mode validation [/]
-      - performance issues with chathistory [X] 
+      - sign in message plugin [ ]:
+        - sign in [ ]:
+          - username [ ]
+          - password [ ]
+          - auth plain [ ]
+        - sign in with Google [ ]:
+          - lou.network passport-google [ ]
+          - redirect to lou.network passport-google /oauth/authorize endpoint [ ]
+          - redirect to Google (passport dance) [ ]
+          - on redirect back, redirect back to lou.network [ ]
+        - sign up [ ]:
+          - account registration [ ]
+      - search cmd [ ]
+      - chathistory targets [ ]:
+         - implement server side [ ]
+         - UI/client-side [ ]
       - INVITES GO OUT [ ]
-      - sasl v3.2 [ ]
+      - performance issues with chathistory [X]
+      - mode validation [/]
+      - channel context [ ]
+      - read-marker [ ]
+      - channel rename [ ]
+      - sasl v3.2 [/]
       - account-extban [ ]
       - account-notify [ ]
       - account-tag [X]
       - extended-join [ ]
       - away-notify [ ]
+      - threading [ ]
       - netsplit/netjoin [ ]
-      - message-redaction [ ]
-      - read-marker [ ]
-      - scroll-to-bottom ui when new/unread messages in buffer [ ]
+      - message-redaction [X]
+      - scroll-to-bottom ui when new/unread messages in buffer [/]:
+        - shows [X]
+        - show on new/unread [ ]
       - pre-away [ ]
-      - channel rename [ ]
       - invite-notify [ ] 
-      - labeled-response [ ]
       - no implicit names [ ]
       - monitor [ ]
       - SNI [ ]
       - STS [ ]
-      - threading [ ]
-      - chathistory targets [ ]
-      - make mediaviewer draggable [ ]
+      - make mediaviewer resziable [X]
     - irc in general [ ]:
       - channel modes [ ]
       - user modes [ ]
@@ -191,4 +228,5 @@
       - sasl oauthbearer [ ]
       - sasl xoauth2 [ ]
       - sasl x-oauth2 [ ]
+      - sasl otp [ ]
   

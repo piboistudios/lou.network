@@ -1,7 +1,13 @@
-
+const { minimatch } = require('minimatch');
+const { mkLogger } = require('../../logger');
+const logger = mkLogger('validate:redirect-uri')
 module.exports = function (redirectUri, client) {
     const stripped = stripUri(redirectUri);
-    return client.redirectUris.includes(stripped);
+    return Boolean(client.redirectUris.find(u => {
+        const ret = minimatch(stripped, u)
+        logger.trace(stripped, "matches", u, "?", ret);
+        return ret;
+    }));
 }
 function stripUri(redirectUri) {
     const splitOff = function (u, char) {

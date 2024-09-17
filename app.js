@@ -1,8 +1,10 @@
 require('./preset-env');
+const send = require('send');
 const uncss = require('uncss');
 const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 
@@ -95,7 +97,33 @@ app.set('view engine', 'pug');
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded());
-app.use(express.static(path.join(__dirname, 'public')));
+const staticWithPath = require('./middleware/static');
+const PUBLIC = path.join(__dirname, 'public');
+app.use("/kiwi", (req, res, next) => {
+  applogger.debug("kiwi params:", req.path.split('/').slice(1));
+  const routepath = req.path.split('/').slice(1).filter(Boolean);
+  let url;
+  const contentPath = [...routepath];
+  const _path = path.join(__dirname, 'public', ...contentPath);
+  const exists = fs.existsSync(_path)
+  applogger.trace(_path, "exists?", exists);
+  function finish(url) {
+    applogger.debug("url", url);
+    if (url === '/') url = '';
+    staticWithPath(PUBLIC, { redirect: false })(url)(req, res, next);
+  }
+  if (exists) {
+    url = '/' + contentPath.filter(Boolean).join('/');
+    // if (url === '/kiwi') url = '/kiwi/';
+
+    finish(url);
+  } else {
+    url = '/kiwi/' + (routepath.length > 1 ? routepath.slice(1).filter(Boolean).join('/') : '');
+    finish(url);
+  }
+});
+app.use(express.static(PUBLIC));
+
 app.use('/users', usersRouter);
 app.use("/auth", authRouter)
 app.use("/oauth", oauthRouter)

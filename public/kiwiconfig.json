@@ -8,6 +8,7 @@
 	"echoMessages": true,
 	"labeledResponses": true,
 	"messageRedaction": true,
+	"baseUrl": "https://lou-network.ngrok.io/kiwi/",
 	"themes": [
 		{
 			"name": "Default",
@@ -128,6 +129,10 @@
 		{
 			"name": "conference-lite",
 			"url": "/javascripts/dist/conference-lite-webpacked.js"
+		},
+		{
+			"name": "url-handler",
+			"url": "/javascripts/dist/url-handler-webpacked.js"
 		},
 		{
 			"name": "account",
