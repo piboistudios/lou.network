@@ -12,7 +12,7 @@
     /* Warning colors */
     --brand-notice: #f6c358;
     --brand-warning: #fcb46e;
-    --brand-error: #bf5155;
+    --brand-error: #c6272c;
 
     /* Connection Indicator top */
     --comp-workspace-before-bg: var(--brand-primary);

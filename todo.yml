@@ -133,7 +133,7 @@
         - rearranging vids somehow [ ]
       - chathistory patch [X]:
         - dedupe messages (also just dont save dupes in first place) [X]
-        - fix interleaving batches [X] (https://github.com/kiwiirc/irc-framework/pull/385)
+        - fix interleaving batches [X](https://github.com/kiwiirc/irc-framework/pull/385)
       - scroll-to-bottom UI [X]
       - custom uri proto handler/url handler/push-state... [ ]:
         - server spa routing [X]:
@@ -169,9 +169,12 @@
       - labeled responses [X]:
         - proxy wrap user/server [X]
         - kiwi.state.addMessage add to labeled buffer if exists over server buffer [X]
-      - standard replies [/]:
-        - irc-framework PR [X] (https://github.com/kiwiirc/irc-framework/pull/386)
-        - kiwi UI [ ]
+      - standard replies [X]:
+        - irc-framework PR [X](https://github.com/kiwiirc/irc-framework/pull/386)
+        - kiwi UI [X]:
+          - render [X](https://github.com/ItsOnlyBinary/kiwiirc/pull/17/commits/5b37383f3ad311498efd69eb7f3537c1f5ffff44)
+          - format [X](https://github.com/ItsOnlyBinary/kiwiirc/pull/17/commits/20b2b7eb1f55086aae2012ca2b2e9d29a1bd1b60)
+          - style  [X](https://github.com/ItsOnlyBinary/kiwiirc/pull/17/commits/a5b6fa492766c79ef3e12a7c40231079300340eb)
       - sign in message plugin [ ]:
         - sign in [ ]:
           - username [ ]

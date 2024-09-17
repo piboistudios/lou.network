@@ -144,12 +144,14 @@ button.u-button.u-button-primary.u-submit.kiwi-welcome-znc-start {
 .kiwi-messagelist-seperator {
     border-top: 2px dashed #00b100;
 }
-
-.kiwi-messagelist-message--highlight {
+.kiwi-messagelist-message-server_message-fail {
+    background: #6a4346;
+}
+.kiwi-messagelist-message--highlight,.kiwi-messagelist-message-server_message-note  {
     background-color: #404040;
 }
 
-.kiwi-messagelist-message-notice {
+.kiwi-messagelist-message-notice,.kiwi-messagelist-message-server_message-warn {
     background: #3c3729;
 }
 
