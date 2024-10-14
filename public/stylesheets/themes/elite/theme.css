@@ -13,6 +13,7 @@
     --brand-notice: #f6c358;
     --brand-warning: #fcb46e;
     --brand-error: #bf5155;
+    --github-icon: url(https://github.githubassets.com/favicons/favicon-dark.png);
 
     /* Connection Indicator top */
     --comp-workspace-before-bg: var(--brand-primary);

@@ -12,7 +12,9 @@
     /* Warning colors */
     --brand-notice: #f6c358;
     --brand-warning: #fcb46e;
+    --github-icon: url(https://github.githubassets.com/favicons/favicon-dark.png);
     --brand-error: #bf5155;
+    --comp-statebrowser-highlight: var(--brand-default-fg) !important;
 
     /* Input elements */
     --brand-input-border: #000000;

@@ -1,0 +1,36 @@
+//- 
+    {
+    username,
+    email,
+    querystring: new URLSearchParams(req.query),
+    incorrect: req.query.incorrect
+
+  }
+extends layouts/auth
+
+block card
+    .section.is-flex.is-justify-content-center
+        
+        .has-text-danger-light #{error}
+        form#form(
+            action="/oauth/update-username?" + querystring
+            method="post"
+        )
+                .field.columns.is-align-items-center
+                    label.label.is-size-7-mobile.has-text-warning-light.column.is-one-quarter(for="username") Username
+                    .column.pt-0
+                        .control.has-icons-left.is-three-quarters
+                            input.input#username(
+                                name="username"
+                                type="text"
+                                pattern="[^\\s@:]+"
+                                title="Username (must not contain spaces, :, or @)"
+                                minlength="3"
+                                placeholder="username"
+                                value=suggestedUsername
+                                required
+                                maxlength="128"
+                            )
+                            span.icon.is-small.is-left
+                                i.fas.fa-fixed-width.fa-user
+    

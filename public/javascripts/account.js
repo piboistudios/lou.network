@@ -6,7 +6,7 @@ kiwi.plugin('account', function(kiwi, log) {
         >
             <h3>Account</h3>
             <div class="kiwi-appsettings-section kiwi-appsettings-advanced-enable">
-                <a class="u-link" href="/auth/logout">Logout</a>
+                <a class="u-link" :href="logoutUrl">Logout</a>
             </div>
         </div>`,
         data() {
@@ -15,6 +15,11 @@ kiwi.plugin('account', function(kiwi, log) {
             }
         },
         computed: {
+            logoutUrl() {
+                const l = new URL('' + location);
+                l.searchParams.set('anon', '');
+                return `/auth/logout?r=${encodeURIComponent(l)}`
+            },
             user() {
                 return this.network.currentUser();
             }

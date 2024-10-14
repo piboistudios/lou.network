@@ -1,4 +1,16 @@
 #!/usr/bin/env node
+
+
+const pbkdf2 = require('@phc/pbkdf2');
+const redirects = require('follow-redirects');
+const genPasscode = require('../routines/gen-passcode');
+/**
+ * @type {import('axios').AxiosStatic}
+ */
+const axios = require('axios');
+const jose = require('jose');
+const { getMailer } = require('../routines/get-mailer');
+const rfc2821 = require('address-rfc2821');
 const bizi = require('bizi-irc/app');
 const state = require('../state');
 const path = require('path');
@@ -7,6 +19,7 @@ const { mkLogger } = require('../logger');
 const fs = require('fs');
 const logger = mkLogger('www');
 const { Sequelize } = require('sequelize');
+const RESERVED_ACCOUNTS = (process.env.RESERVED_ACCOUNTS || '').split(',').filter(Boolean);
 const sequelize = new Sequelize({
   dialect: 'sqlite',
   alter: true,
@@ -21,6 +34,7 @@ const keysExist = [KEY_PATH, CERT_PATH].map(p => fs.existsSync(p)).every(v => Bo
  */
 
 async function main() {
+
   if (!process.env.HOSTNAME) {
     process.env.HOSTNAME = require('os').hostname()
   }
@@ -83,41 +97,118 @@ async function main() {
     dbRefreshInterval: 5000,
     authHandlers: {
       oauth2: async (ctx, u) => {
-        const tok = await oauthToken.findOne({
-          where: {
-            data: ctx.auth.split(' ').pop()
+        const tokenString = ctx.auth.split(' ').pop();
+        logger.trace("Token:", tokenString);
+        const safeCheckExternalProvider = new Promise(async (resolve) => {
+          if (!ctx.host) return resolve(null);
+          const jwksUrl = new URL('https://' + ctx.host + '/.well-known/jwks.json');
+          logger.trace("JWKS URL:", jwksUrl);
+          const fetch = jose.createRemoteJWKSet(jwksUrl, {
+            // agent: new redirects.http.Agent()
+          });
+          let header;
+          try {
+
+            header = jose.decodeProtectedHeader(tokenString);
+          } catch (e) {
+            header = null;
+            logger.trace("Failed to decode JWT header:", e);
           }
-        });
-        logger.trace("Token:", tok);
-        if (!tok) return null;
-        const data = tok.toJSON();
-        if (tok.expiresAt <= new Date()) {
-          return tok.destroy()
-            .then(() => {
-              logger.warn("Expired token:", data);
+          logger.trace("Header:", header);
+          if (!header) return resolve(null);
+          const jwks = await fetch(header)
+            .catch(e => {
+              logger.fatal("failed to fetch JWS:", e);
+              if (e.response) {
+                logger.fatal("JWKS fetch res:", e.response);
+              }
               return null;
             })
-        }
-        const user = await account.findByPk(tok.user);
+          if (!jwks) {
+            logger.error("No jwks found for header:", header);
+            return resolve(null);
+          }
+          const result = await jose.compactVerify(tokenString, jwks)
+            .catch(e => {
+              logger.fatal("Failed to verify:", e);
+              return resolve(null);
+            });
+          if (!result) return resolve(null);
+          try {
+
+            const claims = JSON.parse(new TextDecoder().decode(result.payload));
+
+            const user = await account.findOne({
+              where: require('bizi-irc/features/symbolify')({
+                id: claims.sub,
+                [`meta.principals."${ctx.host}"`]: { $ne: null }
+              })
+            });
+
+            if (!user) {
+              logger.fatal("No account with principal found for user ID:", claims.sub, "@", ctx.host);
+            } else if (typeof user.meta.principals[ctx.host] !== 'object') {
+              user.meta.principals[ctx.host] = claims;
+              user.changed('meta', true);
+              await user.save();
+            }
+            return resolve(user);
+          } catch (e) {
+            logger.trace("Failed to parse JWT:", e);
+            return resolve(null);
+          }
+        });
+        const safeCheckDb = new Promise(async (resolve) => {
+
+          const tok = await oauthToken.findOne({
+            where: {
+              data: tokenString
+            }
+          });
+          logger.trace("Token:", tok);
+          if (!tok) return resolve(null);
+          const data = tok.toJSON();
+          if (tok.expiresAt <= new Date()) {
+            return tok.destroy()
+              .then(() => {
+                logger.warn("Expired token:", data);
+                return resolve(null);
+              })
+          }
+          const user = await account.findByPk(tok.user);
+          return resolve(user);
+        });
+        const promises = [safeCheckExternalProvider, safeCheckDb]
+          .map((p, i) => p.then(v => v || promises.slice(i - 1, i || undefined)[0]));
+        const user = await Promise.race(promises);
         return new Promise((resolve, reject) => app.session(u.req, {}, async () => {
 
           logger.trace("u.req:", u.req);
           logger.trace("u.req.session:", u.req.session);
-          if (u?.req && !u.req.session.user && user) {
-            u.req.session.user = user;
-            await new Promise((resolve, reject) => u.req.session.save(e => {
-              if (e) {
-                logger.trace('failed to save session:', e);
-                return reject(e);
-              }
-              logger.trace('session saved successfully');
-              resolve();
-            }))
+          if (u?.req && !u.req.user && user) {
+
+            await new Promise((resolve, reject) => {
+              u.req.logIn(user, (err) => {
+                if (err) {
+                  logger.error("failed to log user in:", err);
+                  return reject(err);
+                }
+                u.req.session.save(e => {
+                  if (e) {
+                    logger.trace('failed to save session:', e);
+                    return reject(e);
+                  }
+                  logger.trace('session saved successfully');
+                  resolve();
+                });
+              })
+            })
             logger.trace('session saved', u.req, u.req.session)
           }
           logger.trace("User:", user);
+          logger.trace("req,User:", u.req.user);
           resolve({
-            uid: [process.env.HOSTNAME, user.id].join('-'),
+            uid: uid(user),
             ...(user.toJSON() || {})
           });
         })
@@ -129,10 +220,12 @@ async function main() {
         return new Promise((resolve, reject) => {
           app.session(u.req, {}, () => {
             logger.trace("Session?", u.req.session);
-            const user = u.req.session.user;
+            logger.trace("User?", u.req.user);
+
+            const user = u.req.user;
             if (!user) return reject("Not logged in.");
             resolve({
-              uid: [process.env.HOSTNAME, user.id].join('-'),
+              uid: uid(user),
               ...(user || {}),
 
             })
@@ -140,7 +233,159 @@ async function main() {
         })
       }
     },
+    email: opts => {
+      const mailer = getMailer();
+      const mailOpts = {
+        to: opts.to,
+        from: opts.from || process.env.MAIL_USER,
+        subject: opts.subject && ("[💻lou.network] " + opts.subject),
+        text: opts.message,
+      };
+      logger.trace("Sending", mailOpts);
+      return mailer.sendMail(mailOpts)
+        .then(v => {
+          logger.trace("Mail result:", v);
+          return v;
+        })
+        .catch(e => {
+          logger.fatal("Mail error:", e);
+          throw e;
+        })
+    },
+    // onLogin()
+    /**
+     * 
+     * @param user 
+     * @param ircPrincipal 
+     * @param {account} acc 
+     */
+    async onLogin(user, ircPrincipal, acc) {
+      let isNewRecord = false;
+      if (!acc) {
+        logger.trace("auth ctx:", user.auth);
+        isNewRecord = true;
+        acc = new account({
+          ...ircPrincipal.toJSON(),
+          email: user.registration.email,
+          password: user.registration.password && await pbkdf2.hash(user.registration.password),
+          meta: {
+            ircUser: ircPrincipal.toJSON(),
+          }
+        });
+        await acc.save();
 
+        if (user.auth.firstMsg) {
+          const getUserInfo = require('../routines/get-user-info');
+
+          /**
+           * @type {import('bizi-irc/message')}
+           */
+          const ircMsg = user.auth.firstMsg;
+          if (ircMsg.tags["lou.network/auth-callback"] && ircMsg.tags["lou.network/authzid"]) {
+            const authzid = ircMsg.tags["lou.network/authzid"];
+            const url = ircMsg.tags["lou.network/auth-callback"];
+            const host = ircMsg.tags["lou.network/auth-host"];
+            if (host) {
+              acc.meta.principals = {
+                [host]: true
+              }
+              acc.changed('meta', true);
+            }
+            await acc.save();
+
+            logger.trace("authzid", authzid);
+            logger.trace("url:", url);
+            const ui = await getUserInfo({
+              user: acc,
+              ctx: {
+                scope: [
+                  'openid',
+                  'email',
+                  'profile'
+                ]
+              }
+            });
+            const payload = { user: ui.user_info, authzid };
+            logger.trace("payload:", payload)
+            const jws = await new jose.CompactSign(new TextEncoder().encode(JSON.stringify(payload)))
+              .setProtectedHeader({ alg: "RS256", typ: "JWT", kid: app.get('jwk').kid })
+              .sign(app.get('keypair').privateKey);
+            axios.post(url, jws, {
+              headers: {
+                "Content-Type": "application/jose"
+              }
+            })
+              .then(d => {
+                logger.trace("Auth callback successful:", d);
+              })
+              .catch(e => {
+                logger.fatal("Auth callback failure:", e)
+              })
+
+          }
+        }
+      }
+      logger.trace("user before:", user.req.user);
+      return new Promise((resolve, reject) => app.session(user.req, {}, async () => {
+        if (!user.req.user || isNewRecord) {
+
+
+          user.req.logIn(acc, (err) => {
+            if (err) {
+              logger.fatal("Failed to log user in:", err);
+              return reject(err);
+            }
+            user.req.session.save(e => {
+              if (e) {
+                logger.trace("Failed to save session:", e);
+                return reject(e);
+              }
+              logger.trace("Session", user.req.session);
+              logger.trace("Logging user in as", user.req.user);
+              resolve([null, { uid: uid(acc) }]);
+
+            });
+          });
+
+        } else resolve([null, { uid: uid(acc) }]);
+      }));
+    },
+    register: {
+      verify: true,
+      enabled: true,
+      maxVerificationAttempts: 10,
+      genVerificationCode: genPasscode,
+      validate: {
+        async accountName(registration, done) {
+          if (!registration.account) return done('`account` required');
+          if (registration.account.length < 5) return done('Account name too short (must be 5 characters)');
+          if (registration.account.length > 24) return done('Account name too long (max length: 24 characters)');
+          if (RESERVED_ACCOUNTS.includes(registration.account)) return done("Account name reserved.");
+          const existingAcc = await account.findOne({
+            where: {
+              username: registration.account
+            }
+          });
+          if (existingAcc) return done("Account name is taken.");
+          done();
+        },
+        passwordStrength(registration, done) {
+          if (!registration.password || registration.password === '*') return done();
+          if (registration.password.length < 8) return done("Password too short (must be 8 characters)");
+          done();
+        },
+        emailFormat(registration, done) {
+          try {
+            const parsed = new rfc2821.Address(registration.email);
+            logger.trace("Parsed email:", parsed);
+            return done();
+          } catch (e) {
+            logger.trace("Failed to parse email address:", e);
+            return done("Invalid email address: " + registration.email);
+          }
+        }
+      }
+    },
     sequelize,
     server,
 
@@ -149,10 +394,12 @@ async function main() {
   [
     // ['privmsg'],
     // ['notice'],
-    ['tagmsg', { sendFail: true }],
+    // ['tagmsg', { sendFail: true }],
     ['away'],
+    ['batch'],
+    ['kick'],
     ['invite'],
-    ['nick', { silent: true }],
+    // ['nick', { silent: true }],
   ].forEach(pair => irc.use(pair[0], auth(pair[1] || {})));
   logger.trace("irc", irc);
   logger.trace("irc.on", irc.on);
@@ -230,6 +477,9 @@ async function main() {
     debug('Listening on ' + bind);
     process.env.NODE_ENV === 'development' && logger.trace("Env:", process.env)
 
+  }
+  function uid(user) {
+    return [process.env.HOSTNAME, user.id].join('-')
   }
 }
 main()

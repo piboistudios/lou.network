@@ -19,7 +19,7 @@ module.exports = async function (clientId, clientSecret) {
     //     clientId = _clientId;
     //     userId = onBehalfOf;
     // }
-
+    clientId = decodeURIComponent(clientId);
     debug("Getting client", { clientId, clientSecret });
 
     // /**@type {App} */
@@ -57,5 +57,9 @@ module.exports = async function (clientId, clientSecret) {
     const verified = !clientSecret || await pbkdf2.verify(oauthClient.secret, clientSecret);
     debug({ oauthClient, verified });
     if (!verified) invalid_credentials();
+    Object.defineProperty(oauthClient, 'secret_plain', {
+        writable: true,
+        value: clientSecret,
+    });
     return oauthClient;
 }

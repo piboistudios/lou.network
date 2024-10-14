@@ -22,7 +22,7 @@ block card
                 h1 #{client.name || client.id}
             .is-flex.is-justify-content-space-between.mb-5
                 if client.url
-                    a.has-text-warning(href=client.url) Website
+                    span: a.has-text-warning(href=client.url) Website
                 if client.company
                     span.has-text-warning by #{client.company}
             
@@ -37,7 +37,7 @@ block card
 
         .field.is-grouped-right.is-flex.is-justify-space-between.mt-5
             .control
-                a.button.is-link-light(href="/") Cancel
+                a.button.is-link-light(onclick="window.history.back()") Cancel
             .control
                 input#submit.button.is-link(type="submit" value="Allow")
 

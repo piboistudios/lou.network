@@ -7,7 +7,7 @@ const path = require('path');
 const fs = require('fs');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
-
+const account = require('./models/account');
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const oauthRouter = require('./routes/oauth');
@@ -18,6 +18,8 @@ const applogger = mkLogger('app');
 const session = require('express-session');
 const { randomUUID } = require('crypto');
 const app = express();
+const compression = require('compression');
+// app.use(compression());
 const cors = require('cors');
 process.env.NODE_ENV === 'development' && app.use(cors('*'))
 const STYLE_START = '<!-- style-start-->';
@@ -59,13 +61,15 @@ function doUncss(view, html, opts, callback) {
 //   }
 //   next();
 // })
+const passport = require('passport');
+
 app.use(cookieParser());
 // app.use((req,res,next) => {
 //   res.header('cross-origin-opener-policy', 'same-origin');
 //   res.header('cross-origin-embedder-policy', 'require-corp');
 //   next();
 // })
-app.session = session({
+const sess = session({
   // genid: req => {
   //   applogger.trace("cookies:", req.cookies, req.cookie);
   //   if (!app.session.store.has(req.cookies['connect.sid'])) return randomUUID();
@@ -80,10 +84,17 @@ app.session = session({
     maxAge: 60 * 60 * 24 * 1000
   },
 });
-app.use(app.session)
+app.use(sess);
+app.use((req, res, next) => {
+  req.flash = function () {
+    applogger.sub('passport').debug('[FLASH]', ...arguments);
+  }
+  next();
+})
 app.use((req, res, next) => {
   if (!req.query.r) req.query.r = "/";
   res.locals.querystring = req.query ? new URLSearchParams(req.query) : ''
+  res.locals.query = req.query;
   next();
 })
 app.use((req, res, next) => {
@@ -93,7 +104,6 @@ app.use((req, res, next) => {
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
-
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded());
@@ -114,7 +124,7 @@ app.use("/kiwi", (req, res, next) => {
   }
   if (exists) {
     url = '/' + contentPath.filter(Boolean).join('/');
-    // if (url === '/kiwi') url = '/kiwi/';
+    if (url === '/kiwi') url = '/kiwi/';
 
     finish(url);
   } else {
@@ -122,6 +132,35 @@ app.use("/kiwi", (req, res, next) => {
     finish(url);
   }
 });
+
+passport.serializeUser(function (user, done) {
+  applogger.debug("serializing", user);
+  done(null, user.id);
+});
+// used to deserialize the user
+passport.deserializeUser(async function (id, done) {
+  applogger.debug("deserializing", id);
+  const user = await account.findByPk(id);
+  done(null, user);
+});
+app.use(passport.initialize());
+const passportSess = passport.session();
+app.use(passportSess);
+app.session = (req, res, next) =>
+  sess(
+    req,
+    res,
+    e => {
+      if (e) {
+        return next(e);
+      }
+      passportSess(
+        req,
+        res,
+        next
+      )
+    }
+  )
 app.use(express.static(PUBLIC));
 
 app.use('/users', usersRouter);
@@ -129,7 +168,6 @@ app.use("/auth", authRouter)
 app.use("/oauth", oauthRouter)
 app.use("/.well-known", wellKnownRouter)
 app.use('/', indexRouter);
-
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));

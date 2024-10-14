@@ -12,6 +12,11 @@ const logger = mkLogger('auth');
 const uncss = require('uncss');
 const fs = require('fs');
 const createHttpError = require('http-errors');
+const google = require('./auth/providers/google');
+const linkedin = require('./auth/providers/linkedin');
+const github = require('./auth/providers/github');
+const sourcehut = require('./auth/providers/sourcehut');
+const genPasscode = require('../routines/gen-passcode');
 const STYLE_START = '<!-- style-start-->';
 const STYLE_END = '<!-- style-end-->';
 const HEAD_START = '<!-- head-start-->';
@@ -153,7 +158,18 @@ router.use((req, res, next) => {
   logger.trace("Session:", req.session);
   next();
 })
-
+router.use((req, res, next) => {
+  res.locals.authorize = {
+    url: function (n) {
+      return '/auth/' + n + '/login?' + new URLSearchParams(req.query);
+    }
+  }
+  next();
+})
+router.use("/google", google);
+router.use("/linkedin", linkedin);
+router.use("/github", github);
+router.use("/sourcehut", sourcehut);
 /* GET home page. */
 router.get('/sign-up', async (req, res, next) => {
   req.session.registration = {};
@@ -176,7 +192,7 @@ router.post('/registration', async (req, res, next) => {
    * @todo [ ] validate input
    */
   const { username, email, password } = req.body;
-  const code = ('' + Math.floor(Math.random() * 1000000)).padStart(6, '0').slice(0, 6);
+  const code = genPasscode();
   req.session.registration = req.body;
   req.session.registration.code = code;
 
@@ -227,13 +243,20 @@ router.post('/registration/complete', async (req, res, next) => {
     },
     password: await pbkdf2.hash(req.session.registration.password)
   });
-  req.session.user = newUser;
-  await newUser.save();
-  delete req.session.registration;
-  return res.redirect(req.query.r);
+  req.login(newUser, async (err) => {
+    if (err) {
+      return next(err);
+    }
+    await newUser.save();
+    delete req.session.registration;
+    return res.redirect(req.query.r);
+  });
 
 });
 router.post('/invite', async (req, res, next) => {
+  if (!req.user) {
+
+  }
   /**
    * @todo [X] email, subject, details
    * @todo [X] send email with link to finish registration (enter username)
@@ -249,7 +272,7 @@ router.post('/invite', async (req, res, next) => {
   });
   await newUser.save();
   const tail = [req.body.query ? '?' + new URLSearchParams(req.body.query) : '', req.body.fragment ? req.body.fragment.charAt(0) === '#' ? req.body.fragment : '#' + req.body.fragment : ''].filter(Boolean).join('') || '#thelou';
-  const link = `${process.env.BASE_URL}/auth/invite/${newUser.id}${landingPage ? '?r=' + encodeURIComponent(landingPage) : '?r=' + encodeURIComponent('/kiwi/'+tail)}`;
+  const link = `${process.env.BASE_URL}/auth/invite/${newUser.id}${landingPage ? '?r=' + encodeURIComponent(landingPage) : '?r=' + encodeURIComponent('/kiwi/' + tail)}`;
   const result = await sendemail({
     to: email,
     subject: "You've been invited 🖅 " + subject,
@@ -303,13 +326,17 @@ router.post('/invite/accept', async (req, res, next) => {
    * @todo [X] setup req.session
    * @todo [X] redirect to r query param
    */
-  req.session.user = req.session.invite.user;
-  req.session.user.username = req.body.username;
-  req.session.user.meta.registrationComplete = true;
-  logger.trace("session user:", req.session.user, req.session.user.save);
-  await Account.update(req.session.user, { where: { id: req.session.user.id } })
-  delete req.session.invite;
-  return res.redirect(req.query.r);
+  req.user.login(req.session.invite.user, async (err) => {
+    if (err) {
+      return next(err);
+    }
+    req.user.username = req.body.username;
+    req.user.meta.registrationComplete = true;
+    logger.trace("session user:", req.user, req.user.save);
+    await Account.update(req.user, { where: { id: req.user.id } })
+    delete req.session.invite;
+    return res.redirect(req.query.r);
+  });
 
 });
 router.get('/login', async (req, res, next) => {
@@ -318,7 +345,7 @@ router.get('/login', async (req, res, next) => {
    * @todo [X] if user logged in, redirect to r query param
    * @todo [X] if not, render login form
    */
-  if (req.session.user) {
+  if (req.user) {
     return res.redirect(req.query.r)
   }
   return res.render("login")
@@ -369,8 +396,10 @@ router.post('/login', async (req, res, next) => {
     if (!verified) {
       return res.status(401).render("login", INVALID_CREDS)
     }
-    req.session.user = user;
-    return res.redirect(req.query.r);
+    req.login(user, (err) => {
+      if (err) return next(err);
+      return res.redirect(req.query.r);
+    });
   } else {
     return res.status(400).render("login", {
       error: "Password is required."
@@ -415,9 +444,11 @@ router.post("/login/passcode", async (req, res, next) => {
       querystring: new URLSearchParams(req.query),
     })
   }
-  req.session.user = req.session.login.user;
-  delete req.session.login;
-  return res.redirect(req.query.r)
+  req.login(req.session.login.user, (err) => {
+    if (err) return next(err);
+    delete req.session.login;
+    return res.redirect(req.query.r)
+  });
 
 })
 router.get('/reset-password', async (req, res, next) => {
@@ -488,8 +519,14 @@ router.post('/reset-password/:user', async (req, res, next) => {
   return res.render("reset-password_complete")
 });
 router.use("/logout", (req, res) => {
-  req.session && req.session.destroy();
-  return res.status(200).redirect('/auth/login')
+  req.logOut((err) => {
+    if (err) {
+      return next(err);
+    }
+    logger.trace("logged out successfully");
+    req.session && req.session.destroy();
+    return res.status(200).redirect(req.query.r || '/auth/login')
+  });
 })
 
 module.exports = router; 

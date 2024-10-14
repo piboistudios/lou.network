@@ -3,11 +3,12 @@
 :root {
     --brand-primary: rgb(33, 76, 126);
     --brand-primary-hover: #7b5ec9;
-    --brand-midtone: #999292;
+    --brand-midtone: #2f2f2f;
     --brand-darktone: #969696;
     --brand-default-bg: #232329;
     --brand-default-fg: #ababab;
     --brand-notice: #f6c358;
+    --github-icon: url(https://github.githubassets.com/favicons/favicon-dark.png);
     --brand-warning: #fcb46e;
     --brand-error: #b9444c;
     --comp-workspace-before-bg: var(--brand-primary);
@@ -48,7 +49,7 @@
 } */
 
 .kiwi-appsettings-block h3 {
-    color: var(--brand-midtone);
+    color: var(--brand-fg);
 }
 
 .u-link {
@@ -83,7 +84,7 @@
 
 .u-form select {
     background-color: var(--brand-primary);
-    color: var(--brand-midtone);
+    color: var(--brand-fg);
 }
 
 button.u-button.u-button-primary.u-submit.kiwi-welcome-znc-start {
@@ -146,6 +147,10 @@ button.u-button.u-button-primary.u-submit.kiwi-welcome-znc-start {
 }
 .kiwi-messagelist-message-server_message-fail {
     background: #6a4346;
+    color: var(--brand-default-fg) !important;
+}
+.kiwi-messagelist-message-server_message-fail * {
+    color: var(--brand-default-fg) !important;
 }
 .kiwi-messagelist-message--highlight,.kiwi-messagelist-message-server_message-note  {
     background-color: #404040;

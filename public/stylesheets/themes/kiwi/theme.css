@@ -13,7 +13,7 @@
     --brand-notice: #f6c358;
     --brand-warning: #cf742a;
     --brand-error: #bf5155;
-
+    --comp-statebrowser-highlight: var(--brand-notice);
     /* Input elements */
     --brand-input-border: #e2e2e2;
     --brand-input-fg: #616161;

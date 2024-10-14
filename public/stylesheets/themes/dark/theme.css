@@ -2,6 +2,7 @@
 
 :root{
     --brand-primary: #2f896b;
+    --comp-statebrowser-highlight: var(--brand-notice);
     --brand-primary-hover: #5ec9a6;
     --brand-midtone: #2b2b2b;
     --brand-darktone: #969696;
@@ -10,6 +11,7 @@
     --brand-notice: #f6c358;
     --brand-warning: #fcb46e;
     --brand-error: #b9444c;
+    --github-icon: url(https://github.githubassets.com/favicons/favicon-dark.png);
     --comp-workspace-before-bg: var(--brand-primary);
     --comp-bg-kiwi-workspace--disconnected-after-bg: var(--brand-error);
     --comp-header-bg: var(--brand-default-bg);

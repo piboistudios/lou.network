@@ -20,9 +20,9 @@ const model =  h(
         username: {
             type: {
                 name: "STRING",
-                params: [128]
+                params: [32]
             },
-            allowNull: false,
+            allowNull: true,
             unique: true,
         },
         password: {

@@ -23,11 +23,12 @@
         "client_secret_basic",
         "client_secret_post"
     ],
+    "token_endpoint_auth_signing_alg_values_supported": ["HS256"],
     "introspection_endpoint": "%BASE_URL%/oauth/introspection",
     "introspection_endpoint_auth_methods_supported": [
         "client_secret_basic",
         "client_secret_post"
     ],
-    "user_info_endpoint": "%BASE_URL%/oauth/userinfo",
+    "userinfo_endpoint": "%BASE_URL%/oauth/userinfo",
     "registration_endpoint": "%BASE_URL%/oauth/register"
 }

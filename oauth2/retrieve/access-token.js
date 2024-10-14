@@ -3,7 +3,7 @@ const debug = mkLogger('retrieve:accesS_token').debug
 const moment = require('moment');
 const OAuthToken = require('../../models/oauth-token');
 module.exports = async function (accessToken) {
-    debug("Generating token");
+    debug("Retrieving token");
     // /**@type {App} */
     // const app = App.inst;
     // const client = await app.clientSource;
@@ -24,6 +24,9 @@ module.exports = async function (accessToken) {
         logger.trace("Token not found.", token);
         return null;
     }
+
+
+    logger.trace("id_token:", idToken);
     const tokenData = {
         accessToken: token.data,
         accessTokenExpiresAt: moment(token.expiresAt).toDate(),

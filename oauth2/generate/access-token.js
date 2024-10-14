@@ -36,6 +36,9 @@ module.exports = async function (client, user, scope) {
     .setIssuedAt(iat)
     .sign(secret);
   debug("Token", jwt);
+  /**
+   * @todo probably do something with this so we can decrypt tokens or something idk
+   */
   const cipher = crypto.createCipheriv('aes-128-gcm', Buffer.alloc(16).fill(process.env.OAUTH_JWT_SECRET), crypto.randomBytes(12), crypto.randomBytes(12));
   let ciphertext = cipher.update(jwt);
   ciphertext = Buffer.concat([ciphertext,cipher.final()]);

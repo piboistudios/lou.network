@@ -20,6 +20,16 @@ block card
                                 i.fas.fa-key
                         input.checkbox.is-large.mx-5#passcode(name="passcode" type="checkbox" placeholder="username")
                         label.is-size-7-mobile.is-size-5.has-text-weight-bold.has-text-warning-light(for="passcode") Use a One-Time Passcode
+                .is-flex
+                    span Or sign in with:
+                .is-flex.is-justify-content-space-between
+                    a(href=authorize.url('google') title='Google')
+                        img.auth-icon(src='https://www.google.com/favicon.ico')
+                    a(href=authorize.url('linkedin') title='Linkedin')
+                        img.auth-icon(src='https://lou.network/images/linkedin.svg')
+                    a(href=authorize.url('github') title='Github')
+                        .auth-icon.github-sso
+
                 .field.is-flex.is-justify-content-space-between
                     .control
                         a.has-text-warning.is-size-7-mobile(href="/auth/sign-up?" + querystring) Don't have an account? Sign up

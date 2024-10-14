@@ -175,23 +175,137 @@
           - render [X](https://github.com/ItsOnlyBinary/kiwiirc/pull/17/commits/5b37383f3ad311498efd69eb7f3537c1f5ffff44)
           - format [X](https://github.com/ItsOnlyBinary/kiwiirc/pull/17/commits/20b2b7eb1f55086aae2012ca2b2e9d29a1bd1b60)
           - style  [X](https://github.com/ItsOnlyBinary/kiwiirc/pull/17/commits/a5b6fa492766c79ef3e12a7c40231079300340eb)
-      - sign in message plugin [ ]:
+      - sign in message plugin [/]:
         - sign in [ ]:
           - username [ ]
           - password [ ]
           - auth plain [ ]
-        - sign in with Google [ ]:
-          - lou.network passport-google [ ]
-          - redirect to lou.network passport-google /oauth/authorize endpoint [ ]
-          - redirect to Google (passport dance) [ ]
-          - on redirect back, redirect back to lou.network [ ]
+        - sign in with Google [X]:
+          - lou.network passport-google [X]
+          - redirect to lou.network passport-google /oauth/authorize endpoint [X]
+          - redirect to Google (passport dance) [X]
+          - on redirect back, redirect back to lou.network [X]
+        - sign in with LinkedIn [X]
+        - sign in with GitHub [X]
+        - ~sign in with SourceHut [ ]~ No GraphQL
+        - pull suggested username [X]
         - sign up [ ]:
           - account registration [ ]
-      - search cmd [ ]
-      - chathistory targets [ ]:
-         - implement server side [ ]
-         - UI/client-side [ ]
+        - kiwi [X]:
+          - plugin [X]:
+            - btns for: google, github, linkedin, lou [X]
+        - /auth/login [X]:
+          - sign in with: google, github, linkedin btns [X]
+      - fix modes/anon user sht... [X]:
+        - patch mode processing [X]
+        - permissions (which modes user set, which modes server/db/admin set) [X]
+        - set R mode by default on new users [X]
+        - test R mode [X]
+      - /kiwi /kiwi/kiwi redirect issues [X]
+      - oauth sasl autoreconnect issue [X]
+      - search cmd [/]:
+      https://github.com/piboistudios/hxgenpe
+        
+        - search UI [/]:
+          - result listing/*search buffer [X]:
+            - plugin hijack kiwi.state.addMessage [X]:
+              - if message?.batch?.type === 'search' [X]:
+                - change buffer to '*search' buffer [X]
+                - set message.time to -1 [X]
+            - hijack kiwi.state.addBuffer [X]:
+              - if buffer === '*search' [X]:
+                - set buffer.show_input = false [X]
+          - ~state browser plugin [ ]~ just auto-show *search buf for now [X]:
+            - search button (open *search buffer) [ ]
+          - form [X]:
+            - kiwi buffer.special.*.control addUi plugin [X]
+            - search bar [X]
+              - text [X]
+            - view older [ ]:
+              - updates before/after [ ]
+            - advanced settings [X]
+              - in [X]
+              - from [X]
+              - before [X]
+              - after [X]
+          - server impl [/]:
+            - do query [/]:
+              - basics [X]
+              - fix daterange query [X]
+              - batches [X]
+            - authz guards [X]
+          - ui/ux [/]:
+            - clear buffer on batch start search [X]
+            - move all non-search messages to * buffer [X]
+            - highlight search matches [ ]
+            - jump to message [ ]:
+               - call ircClient.chathistory.around(target, msgTs) [X]
+               - add msg to buffer [X]
+               - open buffer [X]
+               - buffer.maybeScrollToId(msgid) [X]
+               - dont fetch chathistory automatically when joining on search [X]
+            - ~group messages by buffer~ show buffer/target [X]
+          - show time from message tag? [X]
+          - styling review [ ]
+            
+        - infinity scroll [/]:
+          - unseen_messages/intersection observer [X]
+          - replace unread_messages with getter [X]
+          - make sure batch gets passed to all buffer messages [X]
+          - fetch when msgs with marker read/seen [X]
+            - when one of messages at top end is seen [/]:
+              - ircClient.chathistory.before(target, firstMsgTs) [X]
+            - when one of messages at bottom end is seen [X]:
+              - ircClient.chathistory.after(target, lastMsgTs) [X]
+            - debounce or something [/] (maybe unnecessary)
+            - when scroll loading, don't stick to top/maintain scroll pos [X]
+            - multiline/chathistory edgecase... [ ]
+            - match chathistory/search authz [ ]
+            - respond to chathistory with empty batch anyway [ ]
+            - fix setting up listeners... [ ]
+            - de-wonk search jump to message [/]
+            - patch chathistory promise (listen for labeled response/standard reply) [ ]
+            - chathistory promise, race timeout [X]
+            - scroll adjustment on chathistory scroll loads [ ]:
+              - messagelist overflow hidden while loading (with timeout race) [ ]
+              - render loading ui [ ]:
+                - kiwi messagelist append addons or w/e [ ]
+            - clear buffer when swapping active buffer if more than msg threshhold [ ]
+          # - chathistory on scroll to top/bottom [ ]
+          - update clearMessages [ ]
+          - buffer request scrollback between/before/after [ ]
+        # - buffer timeslicing [ ]:
+          # - buffer.requestContext(before, after) [ ]
+      - chathistory targets [X]:
+         - implement server side [X]
+         - UI/client-side [X]:
+            - statebrowserbuffer plugins [X]:
+              - styling (and theme GH icon) [X]
+              - next to chan name [X]
+              - listen for raw CHATHISTORY TARGETS <buffer> <timestamp> events [X]:
+                - set kiwi.state.getActiveNetwork().bufferByName(<buffer>).flags.last_known_message = <timestamp> [X]
+                - render plugin if buffer.flags.last_known_message [X]
+      - draft/persistence [ ]:
+        - store user channels/buffers in user.meta [ ]
+        - autorejoin on SASL (to user only) [ ]
+        - auto targets on join [ ]:
+          - getOrAddBuffer [ ]
+      - auth touches [ ]:
+        - sign in via lou.network [ ]
+        - lou.network login -> continue without signing in [ ]
+      - labeled response [ ]:
+        - ACK UI [ ]
+      - patch URI protocol handler [X]
+      - meeting/channel connection [ ]:
+        - show meeting chan in conference/media viewer [ ]
+        - dont allow joining a difference conference while one is ongoing [ ]
+      - reply/react ux [ ]:
+        - esc to escape msg focus/reply/react state [ ]
+        - reset reply/react state on message sent/state canceled [ ]
       - INVITES GO OUT [ ]
+      - oauth failure pages [ ]
+      - browser capability check/fallback uis [ ]
+      - error page in general [ ]
       - performance issues with chathistory [X]
       - mode validation [/]
       - channel context [ ]

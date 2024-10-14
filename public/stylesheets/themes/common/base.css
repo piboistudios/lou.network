@@ -12,15 +12,18 @@
 .kiwi-welcome-znc-error {
     border: 1px dashed var(--brand-error);
 }
-.kiwi-messagelist-message-server_message-fail {
-    background: var(--brand-error);
-}
+
 
 .kiwi-welcome-simple-form .u-submit {
     background-color: var(--brand-primary);
     color: var(--brand-default-bg);
 }
-
+[data-observed="false"] {
+    border: 1px solid var(--brand-notice);
+}
+[data-observed="true"] {
+    border: 1px solid var(--brand-primary);
+}
 .kiwi-welcome-simple .help,
 .kiwi-welcome-simple .help a {
     color: var(--brand-default-fg);
@@ -941,14 +944,22 @@
 .kiwi-messagelist-message-traffic-kick_self {
     color: var(--brand-error);
 }
-
+.kiwi-statebrowser-channel-name {
+    display: flex;
+}
 .kiwi-messagelist-message-traffic-quit .kiwi-nick::before,
 .kiwi-messagelist-message-traffic-quit_self .kiwi-nick::before,
 .kiwi-messagelist-message-traffic-part .kiwi-nick::before,
 .kiwi-messagelist-message-traffic-part_self .kiwi-nick::before {
     color: var(--brand-error);
 }
-
+.kiwi-messagelist-message-server_message-fail {
+    background: var(--brand-error);
+    color: var(--brand-default-bg) !important;
+}
+.kiwi-messagelist-message-server_message-fail * {
+    color: var(--brand-default-bg) !important;
+}
 .inline,
 .inline * {
     white-space: nowrap;
@@ -1139,4 +1150,6 @@
 /* Selected text */
 :root {
     --brand-selected: rgba(0, 0, 255, 0.3);
+    --comp-statebrowser-highlight: var(--brand-primary);
+    --github-icon: url(https://github.githubassets.com/favicons/favicon.png);
 }

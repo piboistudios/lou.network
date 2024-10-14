@@ -2,7 +2,7 @@
 
 :root {
     /* Primary Variables */
-    --brand-primary: #78c9dc;
+    --brand-primary: #61a4c5;
     --brand-primary-hover: #8fd9ea;
     --brand-midtone: #f1f1f1;
     --brand-darktone: #969696;
@@ -26,13 +26,13 @@
 
     /* StateBrowser */
     --comp-statebrowser-fg: #fff;
-    --comp-statebrowser-bg: #4dafc5;
+    --comp-statebrowser-bg: #4d89c5;
     --comp-statebrowser-bg-networkname: #80c8d8;
     --comp-statebrowser-channel-active-bg: #ffffff0d;
     --comp-statebrowser-channel-active-fg: #fff;
     --comp-usermenu-open-bg: #0e0e0e;
     --comp-statebrowser-network-border: #656565;
-
+    --comp-statebrowser-highlight: #3b41d4;
 
     /* Sidebars ( Right Side ) */
     --comp-sidebar-bg: #fff;

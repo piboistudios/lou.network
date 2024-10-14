@@ -8,7 +8,7 @@
 	"echoMessages": true,
 	"labeledResponses": true,
 	"messageRedaction": true,
-	"baseUrl": "https://lou-network.ngrok.io/kiwi/",
+	"baseURL": "https://lou-network.ngrok.io/kiwi/",
 	"themes": [
 		{
 			"name": "Default",
@@ -56,7 +56,7 @@
 	"buffers": {
 		"show_message_info_desktop": true
 	},
-	
+	"autocompleteTokens": ["/", "#", "@","&"],
 	"plugin-emojis": {
 		"sendNativeEmojis": true,
 		"imageTitle": "name", // 'name', 'colons', 'native', ''
@@ -123,6 +123,10 @@
 			"url": "/javascripts/dist/message-redaction-webpacked.js"
 		},
 		{
+			"name": "search",
+			"url": "/javascripts/dist/search-webpacked.js"
+		},
+		{
 			"name": "echo-labeled-response",
 			"url": "/javascripts/dist/echo-labeled-response-webpacked.js"
 		},
@@ -135,9 +139,21 @@
 			"url": "/javascripts/dist/url-handler-webpacked.js"
 		},
 		{
+			"name": "chathistory-targets",
+			"url": "/javascripts/dist/chathistory-targets-webpacked.js"
+		},
+		{
+			"name": "chathistory-autoscroll",
+			"url": "/javascripts/dist/chathistory-autoscroll-webpacked.js"
+		},
+		{
 			"name": "account",
 			"url": "/javascripts/account.js"
-		}
+		},
+		{
+			"name": "sign-up",
+			"url": "/javascripts/sign-up.js"
+		},
 	],
 	"startupOptions": {
 		"server": "lou-network.ngrok.io",
